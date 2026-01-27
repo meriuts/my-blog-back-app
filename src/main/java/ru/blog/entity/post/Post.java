@@ -26,6 +26,8 @@ public class Post {
     private String[] tags;
     private Integer likesCount;
     private Integer commentsCount;
+    private String imageName;
+    private byte[] imageData;
     @MappedCollection(idColumn = "postId")
     private List<Comment> comments;
 

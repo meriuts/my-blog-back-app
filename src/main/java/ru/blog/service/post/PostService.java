@@ -11,13 +11,17 @@ import ru.blog.service.post.dto.addLike.AddPostLikeResponse;
 import ru.blog.service.post.dto.createPost.CreatePostRequest;
 import ru.blog.service.post.dto.createPost.CreatePostResponse;
 import ru.blog.service.post.dto.delete.DeletePostRequest;
+import ru.blog.service.post.dto.getPhoto.GetPostPhotoRequest;
 import ru.blog.service.post.dto.getPost.GetPostRequest;
 import ru.blog.service.post.dto.getPost.GetPostResponse;
 import ru.blog.service.post.dto.search.SearchPostResponse;
 import ru.blog.service.post.dto.search.SearchPostsRequest;
 import ru.blog.service.post.dto.update.UpdatePostRequest;
 import ru.blog.service.post.dto.update.UpdatePostResponse;
+import ru.blog.service.post.dto.updatePhoto.UpdatePostPhotoRequest;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +35,16 @@ public class PostService {
 
     public ResponseEntity<?> invoke(CreatePostRequest request) {
         Post createdPost = postRepository.save(new Post(
-                null, request.getTitle(), request.getText(), request.getTags(), 0, 0, Collections.emptyList())
+                null,
+                request.getTitle(),
+                request.getText(),
+                request.getTags(),
+                0,
+                0,
+                null,
+                null,
+                Collections.emptyList()
+            )
         );
         CreatePostResponse response = postAssembler.assembleCreatePostResponse(createdPost);
         return new ResponseEntity<>(response, HttpStatus.OK);
@@ -65,6 +78,8 @@ public class PostService {
                         request.getTags(),
                         p.getLikesCount(),
                         p.getCommentsCount(),
+                        p.getImageName(),
+                        p.getImageData(),
                         p.getComments()
                 );
                 Post updPost = postRepository.save(newPost);
@@ -91,5 +106,32 @@ public class PostService {
         ).orElse(ResponseEntity.notFound().build());
     }
 
+    public ResponseEntity<?> invoke(UpdatePostPhotoRequest request) {
+        Optional<Post> post = postRepository.findById(request.getPostId());
+
+        return post.map(p -> {
+                    p.setImageName(request.getFile().getOriginalFilename());
+                    try {
+                        p.setImageData(request.getFile().getBytes());
+                    } catch (IOException e) {
+                        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                                "Error updating photo: " + Arrays.toString(e.getStackTrace())
+                        );
+                    }
+                    return ResponseEntity.ok().build();
+                }
+        ).orElse(ResponseEntity.notFound().build());
+    }
+
+
+    public ResponseEntity<?> invoke(GetPostPhotoRequest request) {
+        Optional<Post> post = postRepository.findById(request.getPostId());
+
+        return post.map(p -> {
+                    if (p.getImageData() == null) return ResponseEntity.notFound().build();
+                    return new ResponseEntity<>(p.getImageData(), HttpStatus.OK);
+                }
+        ).orElse(ResponseEntity.notFound().build());
+    }
 
 }

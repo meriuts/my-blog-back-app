@@ -3,6 +3,8 @@ CREATE TABLE posts (
     title TEXT,
     text TEXT,
     tags TEXT[] DEFAULT '{}',
+    imageName TEXT,
+    imageData BYTEA,
     likesCount INTEGER DEFAULT 0 CHECK (likesCount >= 0),
     commentsCount INTEGER DEFAULT 0 CHECK (commentsCount >= 0)
 );

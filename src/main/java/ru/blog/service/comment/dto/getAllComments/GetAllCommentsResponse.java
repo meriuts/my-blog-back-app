@@ -1,4 +1,4 @@
-package ru.blog.service.comment.dto.getComments;
+package ru.blog.service.comment.dto.getAllComments;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +8,6 @@ import java.util.List;
 
 @Data
 @AllArgsConstructor
-public class GetCommentsResponse {
+public class GetAllCommentsResponse {
     private List<Comment> comments;
 }
