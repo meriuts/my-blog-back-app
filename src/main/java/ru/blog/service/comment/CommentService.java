@@ -17,6 +17,8 @@ import ru.blog.service.comment.dto.getComment.GetCommentRequest;
 import ru.blog.service.comment.dto.updateComment.UpdateCommentRequest;
 import ru.blog.service.comment.dto.updateComment.UpdateCommentResponse;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,8 +27,8 @@ import java.util.Optional;
 public class CommentService {
 
     private final CommentsRepository commentsRepository;
-    private PostRepository postRepository;
-    private final CommentAssembler commentAssembler;
+    private final PostRepository postRepository;
+    private final CommentResponseAssembler commentResponseAssembler;
 
     public ResponseEntity<?> invoke(GetAllCommentsRequest request) {
         List<Comment> comments = commentsRepository.findAllByPostId(request.getPostId());
@@ -35,7 +37,7 @@ public class CommentService {
             return ResponseEntity.notFound().build();
         }
 
-        GetAllCommentsResponse responses = commentAssembler.assembleGetAllCommentsResponse(comments);
+        GetAllCommentsResponse responses = commentResponseAssembler.assembleGetAllCommentsResponse(comments);
 
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
@@ -47,7 +49,7 @@ public class CommentService {
                 .flatMap(p -> p.getComments().stream()
                         .filter(comment -> comment.getId().equals(request.getCommentId()))
                         .findFirst()
-                        .map(commentAssembler::assembleGetCommentsResponse)
+                        .map(commentResponseAssembler::assembleGetCommentsResponse)
                         .map(response -> new ResponseEntity<>(response, HttpStatus.OK))
                 )
                 .orElse(ResponseEntity.notFound().build());
@@ -57,9 +59,9 @@ public class CommentService {
         Optional<Post> post = postRepository.findById(postId);
 
         return post.map(p -> {
-                Comment comment = new Comment(null, request.getText(), request.getPostId());
+                Comment comment = new Comment(null, request.getText(), request.getPostId(), LocalDateTime.now());
                 Comment newComment = commentsRepository.save(comment);
-                AddCommentResponse response = commentAssembler.assembleAddCommentsResponse(newComment);
+                AddCommentResponse response = commentResponseAssembler.assembleAddCommentsResponse(newComment);
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
         ).orElse(ResponseEntity.notFound().build());
@@ -77,7 +79,7 @@ public class CommentService {
                             return commentsRepository.save(comment);
                         })
                         .map(savedComment -> {
-                            UpdateCommentResponse response = commentAssembler.assembleUpdateCommentResponse(savedComment);
+                            UpdateCommentResponse response = commentResponseAssembler.assembleUpdateCommentResponse(savedComment);
                             return new ResponseEntity<>(response, HttpStatus.OK);
                         })
                 )

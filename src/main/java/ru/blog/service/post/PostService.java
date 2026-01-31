@@ -30,7 +30,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class PostService {
 
-    private final PostAssembler postAssembler;
+    private final PostResponseAssembler postResponseAssembler;
     private final PostRepository postRepository;
 
     public ResponseEntity<?> invoke(CreatePostRequest request) {
@@ -43,17 +43,18 @@ public class PostService {
                 0,
                 null,
                 null,
-                Collections.emptyList()
+                Collections.emptySet()
             )
         );
-        CreatePostResponse response = postAssembler.assembleCreatePostResponse(createdPost);
+        CreatePostResponse response = postResponseAssembler.assembleCreatePostResponse(createdPost);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     public ResponseEntity<?> invoke(SearchPostsRequest request) {
-        List<Post> posts = postRepository.findByContentWithPagination(request.getSearch(), request.getPageSize(), request.getOffset());
-        Integer postsCount = postRepository.countPostsByContent(request.getSearch());
-        SearchPostResponse response = postAssembler.assembleSearchPostsResponse(posts, request.getPageNumber(), request.getPageSize(), postsCount);
+        String searchPattern = "%" + request.getSearch() + "%";
+        List<Post> posts = postRepository.findByContentWithPagination(searchPattern, request.getPageSize(), request.getOffset());
+        Integer postsCount = postRepository.countPostsByContent(searchPattern);
+        SearchPostResponse response = postResponseAssembler.assembleSearchPostsResponse(posts, request.getPageNumber(), request.getPageSize(), postsCount);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -61,7 +62,7 @@ public class PostService {
         Optional<Post> post = postRepository.findById(request.getId());
 
         return post.map(p -> {
-                GetPostResponse response = postAssembler.assembleGetPostsResponse(p);
+                GetPostResponse response = postResponseAssembler.assembleGetPostsResponse(p);
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
         ).orElse(ResponseEntity.notFound().build());
@@ -72,7 +73,7 @@ public class PostService {
 
         return post.map(p -> {
                 Post newPost = new Post(
-                        request.getId(),
+                        p.getId(),
                         request.getTitle(),
                         request.getText(),
                         request.getTags(),
@@ -83,7 +84,7 @@ public class PostService {
                         p.getComments()
                 );
                 Post updPost = postRepository.save(newPost);
-                UpdatePostResponse response = postAssembler.assembleUpdatePostResponse(updPost);
+                UpdatePostResponse response = postResponseAssembler.assembleUpdatePostResponse(updPost);
                 return new ResponseEntity<>(response, HttpStatus.OK);
             }
         ).orElse(ResponseEntity.notFound().build());
@@ -100,7 +101,7 @@ public class PostService {
 
         return post.map(p -> {
                     postRepository.addPostLike(p.getId());
-                    AddPostLikeResponse response = postAssembler.assembleAddPostLikeResponse(p.getLikesCount() + 1);
+                    AddPostLikeResponse response = postResponseAssembler.assembleAddPostLikeResponse(p.getLikesCount() + 1);
                     return new ResponseEntity<>(response, HttpStatus.OK);
                 }
         ).orElse(ResponseEntity.notFound().build());

@@ -10,18 +10,34 @@ import ru.blog.service.comment.dto.updateComment.UpdateCommentResponse;
 import java.util.List;
 
 @Component
-public class CommentAssembler {
+public class CommentResponseAssembler {
 
     public GetAllCommentsResponse assembleGetAllCommentsResponse(List<Comment> comment) {
-        return new GetAllCommentsResponse(comment);
+        List<GetCommentsResponse> commentsResponse = comment.stream().map(
+                comm -> new GetCommentsResponse(
+                        comm.getId(),
+                        comm.getText(),
+                        comm.getPostId()
+                )
+        ).toList();
+
+        return new GetAllCommentsResponse(commentsResponse);
     }
 
     public GetCommentsResponse assembleGetCommentsResponse(Comment comment) {
-        return new GetCommentsResponse(comment);
+        return new GetCommentsResponse(
+                comment.getId(),
+                comment.getText(),
+                comment.getPostId()
+        );
     }
 
     public AddCommentResponse assembleAddCommentsResponse(Comment comment) {
-        return new AddCommentResponse(comment);
+        return new AddCommentResponse(
+                comment.getId(),
+                comment.getText(),
+                comment.getPostId()
+        );
     }
 
     public UpdateCommentResponse assembleUpdateCommentResponse(Comment comment) {

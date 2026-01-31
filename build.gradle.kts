@@ -10,20 +10,42 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("org.springframework:spring-framework-bom:6.1.10"))
+    // Spring BOM
+    implementation(enforcedPlatform("org.springframework:spring-framework-bom:6.1.10"))
+
+    // Spring модули
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-webmvc")
     implementation("org.springframework:spring-jdbc")
     implementation("org.springframework.data:spring-data-jdbc:4.0.2")
-    implementation("org.springframework:spring-test")
-    implementation("jakarta.annotation:jakarta.annotation-api:3.0.0")
+    implementation("org.jspecify:jspecify:1.0.0")
+
+    // База данных
     implementation("org.postgresql:postgresql:42.7.9")
+
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.17.0")
+    implementation("com.fasterxml.jackson.core:jackson-core:2.17.0")
+    implementation("com.fasterxml.jackson.core:jackson-annotations:2.17.0")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+
+    // Jakarta
+    implementation("jakarta.annotation:jakarta.annotation-api:3.0.0")
+    implementation("jakarta.servlet:jakarta.servlet-api:6.0.0")
+
+    // Jetty для локального запуска
+    implementation("org.eclipse.jetty:jetty-server:11.0.15")
+    implementation("org.eclipse.jetty:jetty-servlet:11.0.15")
+
 
     compileOnly("org.projectlombok:lombok:1.18.32")
     annotationProcessor("org.projectlombok:lombok:1.18.32")
 
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.springframework:spring-test")
+
+    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+
+    testImplementation("org.mockito:mockito-junit-jupiter:5.21.0")
+    testImplementation("org.mockito:mockito-core:5.21.0")
 }
 
 tasks.test {

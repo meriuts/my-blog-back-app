@@ -5,11 +5,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 import ru.blog.entity.comment.Comment;
 
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -23,12 +25,16 @@ public class Post {
 
     private String title;
     private String text;
-    private String[] tags;
+    private List<String> tags;
+    @Column("likes_count")
     private Integer likesCount;
+    @Column("comments_count")
     private Integer commentsCount;
+    @Column("image_name")
     private String imageName;
+    @Column("image_data")
     private byte[] imageData;
-    @MappedCollection(idColumn = "postId")
-    private List<Comment> comments;
+    @MappedCollection(idColumn = "post_id")
+    private Set<Comment> comments;
 
 }

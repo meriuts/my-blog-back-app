@@ -11,7 +11,7 @@ import ru.blog.service.post.dto.update.UpdatePostResponse;
 import java.util.List;
 
 @Component
-public class PostAssembler {
+public class PostResponseAssembler {
 
     public CreatePostResponse assembleCreatePostResponse(Post post) {
         return new CreatePostResponse(
@@ -34,8 +34,19 @@ public class PostAssembler {
     }
 
     public SearchPostResponse assembleSearchPostsResponse(List<Post> posts, Integer pageNumber, Integer pageSize, Integer postsCount) {
-       return new SearchPostResponse(
-                posts,
+       List<GetPostResponse> postResponses = posts.stream().map(
+               post -> new GetPostResponse(
+                       post.getId(),
+                       post.getTitle(),
+                       post.getText(),
+                       post.getTags(),
+                       post.getLikesCount(),
+                       post.getCommentsCount()
+               )
+       ) .toList();
+
+        return new SearchPostResponse(
+                postResponses,
                 pageNumber > 0,
                 pageNumber < postsCount,
                 postsCount / pageSize

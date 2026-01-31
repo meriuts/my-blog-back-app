@@ -44,74 +44,74 @@ public class Controller {
     }
 
     @PostMapping("/posts/{id}")
-    public ResponseEntity<?> getPost(@PathVariable Long id) {
+    public ResponseEntity<?> getPost(@PathVariable("id") Long id) {
         return postService.invoke(new GetPostRequest(id));
     }
 
     @PutMapping("/posts/{id}")
     public ResponseEntity<?> updatePost(
             @RequestBody UpdatePostRequest request,
-            @PathVariable Long id) {
+            @PathVariable("id") Long id) {
         return postService.invoke(request, id);
     }
 
     @DeleteMapping("/posts/{id}")
-    public ResponseEntity<?> deletePost(@PathVariable Long id) {
+    public ResponseEntity<?> deletePost(@PathVariable("id") Long id) {
         return postService.invoke(new DeletePostRequest(id));
     }
 
     @PostMapping("/posts/{id}/likes")
-    public ResponseEntity<?> addLike(@PathVariable Long id) {
+    public ResponseEntity<?> addLike(@PathVariable("id") Long id) {
         return postService.invoke(new AddPostLikeRequest(id));
     }
 
     @PutMapping(value = "/posts/{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> updatePhoto(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestParam("image") MultipartFile image
     ) {
         return postService.invoke(new UpdatePostPhotoRequest(id, image));
     }
 
-    @GetMapping("/posts/{id}/image")
-    public ResponseEntity<?> getPostPhoto(@PathVariable Long postId) {
+    @GetMapping("/posts/{postId}/image")
+    public ResponseEntity<?> getPostPhoto(@PathVariable("postId") Long postId) {
         return postService.invoke(new GetPostPhotoRequest(postId));
     }
 
     @GetMapping("/posts/{postId}/comments")
-    public ResponseEntity<?> getComments(@PathVariable Long postId) {
+    public ResponseEntity<?> getComments(@PathVariable("postId") Long postId) {
         return commentService.invoke(new GetAllCommentsRequest(postId));
     }
 
     @GetMapping("/posts/{postId}/comments/{commentId}")
     public ResponseEntity<?> getComment(
-            @PathVariable Long postId,
-            @PathVariable Long commentId
+            @PathVariable("postId") Long postId,
+            @PathVariable("commentId") Long commentId
         ) {
         return commentService.invoke(new GetCommentRequest(postId, commentId));
     }
 
-    @PostMapping("/api/posts/{postId}/comments")
+    @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<?> addComment(
             @RequestBody AddCommentRequest request,
-            @PathVariable Long postId
+            @PathVariable("postId") Long postId
     ) {
         return commentService.invoke(request, postId);
     }
 
     @PutMapping("/posts/{postId}/comments/{commentId}")
-    public ResponseEntity<?> updatePost(
+    public ResponseEntity<?> updateCommentPost(
             @RequestBody UpdateCommentRequest request,
-            @PathVariable Long postId,
-            @PathVariable Long commentId
+            @PathVariable("postId") Long postId,
+            @PathVariable("commentId") Long commentId
     ) {
         return commentService.invoke(request, postId, commentId);
     }
 
     @DeleteMapping("/posts/{postId}/comments/{commentId}")
     public ResponseEntity<?> deleteComment(
-            @PathVariable Long postId,
-            @PathVariable Long commentId
+            @PathVariable("postId") Long postId,
+            @PathVariable("commentId") Long commentId
     ) {
         return commentService.invoke(new DeleteCommentRequest(postId,commentId));
     }
