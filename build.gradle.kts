@@ -43,9 +43,18 @@ dependencies {
     testImplementation("org.springframework:spring-test")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.11.2")
+
 
     testImplementation("org.mockito:mockito-junit-jupiter:5.21.0")
     testImplementation("org.mockito:mockito-core:5.21.0")
+    testImplementation("org.hamcrest:hamcrest:2.2")
+    testImplementation("com.h2database:h2:2.4.240")
+    testImplementation("org.testcontainers:junit-jupiter:1.19.0")
+    testImplementation("org.testcontainers:postgresql:1.19.0")
+    implementation("com.jayway.jsonpath:json-path:2.10.0")
+
 }
 
 tasks.test {

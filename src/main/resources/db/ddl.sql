@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS posts (
     id BIGSERIAL PRIMARY KEY,
     title TEXT,
     text TEXT,
-    tags TEXT[] DEFAULT '{}',
+    tags TEXT[],
     image_name TEXT,
     image_data BYTEA,
     likes_count INTEGER DEFAULT 0 CHECK (likes_count >= 0),

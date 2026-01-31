@@ -1,43 +1,78 @@
-//package ru.blog.service;
-//
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.test.context.ContextConfiguration;
-//import org.springframework.test.context.junit.jupiter.SpringExtension;
-//import ru.blog.TestConfig;
-//import ru.blog.config.AppConfig;
-//import ru.blog.entity.post.PostRepository;
-//import ru.blog.service.post.PostService;
-//
-//@ExtendWith(SpringExtension.class)
-//@ContextConfiguration(classes = {
-//        AppConfig.class,
-//        TestConfig.class
-//})
-//class PostServiceTest {
-//
-//    @Autowired
-//    private PostService postService;
-//
-//    @Autowired
-//    private PostRepository postRepository;
-//
-//    @Test
-//    void invoke_shouldSavePost() {
-////        // given
-////        CreatePostRequest request = new CreatePostRequest("title", "text", List.of("java"));
-////
-////        Post savedPost = new Post(
-////                1L, "title", "text", List.of("java"),
-////                0, 0, null, null, Collections.emptyList()
-////        );
-////
-////        Mockito.when(postRepository.save(Mockito.any(Post.class))).thenReturn(savedPost);
-////
-////        ResponseEntity<?> response = postService.invoke(request);
-////
-////        assertEquals(HttpStatus.OK, response.getStatusCode());
-////        Mockito.verify(postRepository).save(Mockito.any(Post.class));
-//    }
-//}
+package ru.blog.service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import ru.blog.config.DataSourceConfiguration;
+import ru.blog.config.WebConfiguration;
+import ru.blog.service.post.dto.createPost.CreatePostRequest;
+
+import java.util.List;
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+
+@SpringJUnitConfig(classes = {
+        DataSourceConfiguration.class,
+        WebConfiguration.class,
+})
+@WebAppConfiguration
+@Testcontainers
+class PostServiceTest {
+
+    @Autowired
+    private WebApplicationContext wac;
+
+    private MockMvc mockMvc;
+
+    @Container
+    public static PostgreSQLContainer<?> postgresContainer = new PostgreSQLContainer<>("postgres:16.1")
+            .withDatabaseName("blog")
+            .withUsername("user")
+            .withPassword("pass");
+
+    @BeforeAll
+    public static void beforeAll() {
+        System.setProperty("db.driver", "org.postgresql.Driver");
+        System.setProperty("db.url", postgresContainer.getJdbcUrl());
+        System.setProperty("db.username", postgresContainer.getUsername());
+        System.setProperty("db.password", postgresContainer.getPassword());
+    }
+
+    @BeforeEach
+    void setup() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+    }
+
+    @Test
+    void shouldSavePost() throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        CreatePostRequest request = new CreatePostRequest("Пост", "Новый пост", List.of("java"));
+
+        mockMvc.perform(post("/api/posts")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(request))
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.title").value("Пост"))
+                .andExpect(jsonPath("$.text").value("Новый пост"));
+
+    }
+}
+
+
+
+
