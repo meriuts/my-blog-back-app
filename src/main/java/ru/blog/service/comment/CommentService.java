@@ -17,7 +17,6 @@ import ru.blog.service.comment.dto.getComment.GetCommentRequest;
 import ru.blog.service.comment.dto.updateComment.UpdateCommentRequest;
 import ru.blog.service.comment.dto.updateComment.UpdateCommentResponse;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
