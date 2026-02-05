@@ -1,0 +1,11 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: my-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: blog
+    ports:
+      - "5432:5432"
